@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  postgresql:
+    image: postgres:16-alpine
+    container_name: ecommerce-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-ecommerce}
+      POSTGRES_USER: ${DB_USERNAME:-ecommerce}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ecommerce}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecommerce"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecommerce-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/${DB_NAME:-ecommerce}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-ecommerce}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-ecommerce}
+      JWT_SECRET: ${JWT_SECRET:-your-256-bit-secret-key-change-this-in-production}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:4200,http://localhost:5173}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    volumes:
+      - ./backend:/app
+
+  frontend-angular:
+    build:
+      context: ./frontend-angular
+      dockerfile: Dockerfile
+    container_name: ecommerce-frontend
+    ports:
+      - "4200:80"
+    environment:
+      API_URL: http://localhost:8080/api/v1
+    networks:
+      - ecommerce-network
+    depends_on:
+      - backend
+
+  admin-vue:
+    build:
+      context: ./admin-vue
+      dockerfile: Dockerfile
+    container_name: ecommerce-admin
+    ports:
+      - "5173:80"
+    environment:
+      VITE_API_URL: http://localhost:8080/api/v1
+    networks:
+      - ecommerce-network
+    depends_on:
+      - backend
+
+networks:
+  ecommerce-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  

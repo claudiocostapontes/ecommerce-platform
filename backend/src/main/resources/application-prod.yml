@@ -1,0 +1,14 @@
+spring:
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    root: WARN
+    br.com.ecommerce: INFO
+    org.springframework.web: WARN
+
+server:
+  error:
+    include-stacktrace: never
+    include-exception: false

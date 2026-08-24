@@ -1,0 +1,55 @@
+# IntelliJ IDEA
+/.idea/
+**/.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Java / Maven
+target/
+**/target/
+*.class
+
+# Node.js
+node_modules/
+**/node_modules/
+
+# Angular
+.angular/
+**/.angular/
+frontend-angular/dist/
+
+# Vue / Vite
+.vite/
+**/.vite/
+admin-vue/dist/
+
+# Environment / Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Permitir arquivo de exemplo
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Coverage
+coverage/
+
+# Sistema operacional
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Temporarios
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
