@@ -34,16 +34,6 @@ CREATE TABLE IF NOT EXISTS customer_addresses (
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
     );
 
--- Create customer_favorites table
-CREATE TABLE IF NOT EXISTS customer_favorites (
-                                                  customer_id UUID NOT NULL,
-                                                  product_id UUID NOT NULL,
-                                                  PRIMARY KEY (customer_id, product_id),
-    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-    );
-
 -- Create indexes
 CREATE INDEX idx_customers_user_id ON customers(user_id);
 CREATE INDEX idx_customer_addresses_customer_id ON customer_addresses(customer_id);
-CREATE INDEX idx_customer_favorites_customer_id ON customer_favorites(customer_id);

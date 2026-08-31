@@ -24,82 +24,90 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
-    
+
     private final CustomerRepository customerRepository;
     private final CustomerAddressRepository addressRepository;
     private final UserRepository userRepository;
-    
-    @Transactional(readOnly = true)
+
+    @Transactional
     public CustomerProfileDTO getProfile(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", username));
-        
+        User user = getUser(username);
+
         Customer customer = customerRepository.findByUserId(user.getId())
                 .orElseGet(() -> createDefaultCustomer(user));
-        
+
         return toProfileDTO(customer, user);
     }
-    
+
     @Transactional
-    public CustomerProfileDTO updateProfile(String username, UpdateCustomerRequest request) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", username));
-        
+    public CustomerProfileDTO updateProfile(
+            String username,
+            UpdateCustomerRequest request
+    ) {
+        User user = getUser(username);
+
         Customer customer = customerRepository.findByUserId(user.getId())
                 .orElseGet(() -> createDefaultCustomer(user));
-        
+
         if (request.firstName() != null) {
             user.setFirstName(request.firstName());
         }
+
         if (request.lastName() != null) {
             user.setLastName(request.lastName());
         }
-        
+
         if (request.cpf() != null) {
             customer.setCpf(request.cpf());
         }
+
         if (request.birthDate() != null) {
             customer.setBirthDate(request.birthDate());
         }
+
         if (request.phone() != null) {
             customer.setPhone(request.phone());
         }
+
         if (request.newsletterSubscribed() != null) {
-            customer.setNewsletterSubscribed(request.newsletterSubscribed());
+            customer.setNewsletterSubscribed(
+                    request.newsletterSubscribed()
+            );
         }
+
         if (request.marketingNotifications() != null) {
-            customer.setMarketingNotifications(request.marketingNotifications());
+            customer.setMarketingNotifications(
+                    request.marketingNotifications()
+            );
         }
-        
+
         userRepository.save(user);
-        customerRepository.save(customer);
-        
+        customer = customerRepository.save(customer);
+
         log.info("Customer profile updated: {}", username);
-        
+
         return toProfileDTO(customer, user);
     }
-    
+
     @Transactional(readOnly = true)
     public List<CustomerAddressDTO> getAddresses(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", username));
-        
-        Customer customer = customerRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found for user: " + username));
-        
-        return customer.getAddresses().stream()
+        User user = getUser(username);
+        Customer customer = getCustomer(user, username);
+
+        return customer.getAddresses()
+                .stream()
                 .map(this::toAddressDTO)
                 .collect(Collectors.toList());
     }
-    
+
     @Transactional
-    public CustomerAddressDTO createAddress(String username, CreateAddressRequest request) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", username));
-        
-        Customer customer = customerRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found for user: " + username));
-        
+    public CustomerAddressDTO createAddress(
+            String username,
+            CreateAddressRequest request
+    ) {
+        User user = getUser(username);
+        Customer customer = getCustomer(user, username);
+
         CustomerAddress address = CustomerAddress.builder()
                 .label(request.label())
                 .street(request.street())
@@ -109,27 +117,39 @@ public class CustomerService {
                 .city(request.city())
                 .state(request.state())
                 .zipCode(request.zipCode())
-                .isDefault(request.isDefault() != null ? request.isDefault() : false)
+                .isDefault(Boolean.TRUE.equals(request.isDefault()))
                 .build();
-        
+
         customer.addAddress(address);
-        
+
+        customerRepository.saveAndFlush(customer);
+
         if (Boolean.TRUE.equals(request.isDefault())) {
             customer.setDefaultAddress(address.getId());
+            customerRepository.save(customer);
         }
-        
-        customer = customerRepository.save(customer);
-        
-        log.info("Address created for customer: {}", username);
-        
+
+        log.info(
+                "Address {} created for customer: {}",
+                address.getId(),
+                username
+        );
+
         return toAddressDTO(address);
     }
-    
+
     @Transactional
-    public CustomerAddressDTO updateAddress(UUID addressId, CreateAddressRequest request) {
-        CustomerAddress address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address", addressId));
-        
+    public CustomerAddressDTO updateAddress(
+            String username,
+            UUID addressId,
+            CreateAddressRequest request
+    ) {
+        User user = getUser(username);
+        Customer customer = getCustomer(user, username);
+
+        CustomerAddress address =
+                getOwnedAddress(customer, addressId);
+
         address.setLabel(request.label());
         address.setStreet(request.street());
         address.setNumber(request.number());
@@ -138,72 +158,150 @@ public class CustomerService {
         address.setCity(request.city());
         address.setState(request.state());
         address.setZipCode(request.zipCode());
-        
+
         if (Boolean.TRUE.equals(request.isDefault())) {
-            address.getCustomer().setDefaultAddress(addressId);
+            customer.setDefaultAddress(addressId);
+        } else if (request.isDefault() != null) {
+            address.setIsDefault(false);
         }
-        
+
         address = addressRepository.save(address);
-        
-        log.info("Address updated: {}", addressId);
-        
+
+        log.info(
+                "Address {} updated by customer: {}",
+                addressId,
+                username
+        );
+
         return toAddressDTO(address);
     }
-    
+
     @Transactional
-    public void deleteAddress(UUID addressId) {
-        CustomerAddress address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address", addressId));
-        
-        address.getCustomer().removeAddress(address);
-        addressRepository.delete(address);
-        
-        log.info("Address deleted: {}", addressId);
+    public void deleteAddress(
+            String username,
+            UUID addressId
+    ) {
+        User user = getUser(username);
+        Customer customer = getCustomer(user, username);
+
+        CustomerAddress address =
+                getOwnedAddress(customer, addressId);
+
+        customer.removeAddress(address);
+
+        customerRepository.save(customer);
+
+        log.info(
+                "Address {} deleted by customer: {}",
+                addressId,
+                username
+        );
     }
-    
+
     @Transactional
-    public void addToFavorites(String username, UUID productId) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", username));
-        
-        Customer customer = customerRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found for user: " + username));
-        
+    public void addToFavorites(
+            String username,
+            UUID productId
+    ) {
+        User user = getUser(username);
+        Customer customer = getCustomer(user, username);
+
         customer.addFavorite(productId);
         customerRepository.save(customer);
-        
-        log.info("Product {} added to favorites by {}", productId, username);
+
+        log.info(
+                "Product {} added to favorites by {}",
+                productId,
+                username
+        );
     }
-    
+
     @Transactional
-    public void removeFromFavorites(String username, UUID productId) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", username));
-        
-        Customer customer = customerRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found for user: " + username));
-        
+    public void removeFromFavorites(
+            String username,
+            UUID productId
+    ) {
+        User user = getUser(username);
+        Customer customer = getCustomer(user, username);
+
         customer.removeFavorite(productId);
         customerRepository.save(customer);
-        
-        log.info("Product {} removed from favorites by {}", productId, username);
+
+        log.info(
+                "Product {} removed from favorites by {}",
+                productId,
+                username
+        );
     }
-    
+
+    private User getUser(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "User",
+                                username
+                        )
+                );
+    }
+
+    private Customer getCustomer(
+            User user,
+            String username
+    ) {
+        return customerRepository.findByUserId(user.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Customer not found for user: "
+                                        + username
+                        )
+                );
+    }
+
+    private CustomerAddress getOwnedAddress(
+            Customer customer,
+            UUID addressId
+    ) {
+        return customer.getAddresses()
+                .stream()
+                .filter(address ->
+                        addressId.equals(address.getId())
+                )
+                .findFirst()
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Address",
+                                addressId
+                        )
+                );
+    }
+
     private Customer createDefaultCustomer(User user) {
         Customer customer = Customer.builder()
                 .user(user)
                 .newsletterSubscribed(false)
                 .marketingNotifications(false)
                 .build();
-        
-        return customerRepository.save(customer);
+
+        customer = customerRepository.save(customer);
+
+        log.info(
+                "Default customer profile created for user: {}",
+                user.getUsername()
+        );
+
+        return customer;
     }
-    
-    private CustomerProfileDTO toProfileDTO(Customer customer, User user) {
-        List<CustomerAddressDTO> addresses = customer.getAddresses().stream()
-                .map(this::toAddressDTO)
-                .collect(Collectors.toList());
-        
+
+    private CustomerProfileDTO toProfileDTO(
+            Customer customer,
+            User user
+    ) {
+        List<CustomerAddressDTO> addresses =
+                customer.getAddresses()
+                        .stream()
+                        .map(this::toAddressDTO)
+                        .collect(Collectors.toList());
+
         return CustomerProfileDTO.builder()
                 .id(customer.getId())
                 .username(user.getUsername())
@@ -214,12 +312,18 @@ public class CustomerService {
                 .birthDate(customer.getBirthDate())
                 .phone(customer.getPhone())
                 .addresses(addresses)
-                .newsletterSubscribed(customer.getNewsletterSubscribed())
-                .marketingNotifications(customer.getMarketingNotifications())
+                .newsletterSubscribed(
+                        customer.getNewsletterSubscribed()
+                )
+                .marketingNotifications(
+                        customer.getMarketingNotifications()
+                )
                 .build();
     }
-    
-    private CustomerAddressDTO toAddressDTO(CustomerAddress address) {
+
+    private CustomerAddressDTO toAddressDTO(
+            CustomerAddress address
+    ) {
         return CustomerAddressDTO.builder()
                 .id(address.getId())
                 .label(address.getLabel())
@@ -231,7 +335,9 @@ public class CustomerService {
                 .state(address.getState())
                 .zipCode(address.getZipCode())
                 .isDefault(address.getIsDefault())
-                .formattedAddress(address.getFormattedAddress())
+                .formattedAddress(
+                        address.getFormattedAddress()
+                )
                 .build();
     }
 }
