@@ -1,0 +1,91 @@
+:root {
+    /* Brand */
+    --color-primary-50: #eff6ff;
+    --color-primary-100: #dbeafe;
+    --color-primary-500: #2563eb;
+    --color-primary-600: #155eef;
+    --color-primary-700: #175cd3;
+    --color-primary-900: #102a56;
+
+    /* Neutral */
+    --color-white: #ffffff;
+    --color-gray-25: #fcfcfd;
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f2f4f7;
+    --color-gray-200: #eaecf0;
+    --color-gray-300: #d0d5dd;
+    --color-gray-500: #667085;
+    --color-gray-600: #475467;
+    --color-gray-700: #344054;
+    --color-gray-900: #101828;
+    --color-ink: #0b1220;
+
+    /* Semantic */
+    --color-success-50: #ecfdf3;
+    --color-success-600: #039855;
+    --color-warning-50: #fffaeb;
+    --color-warning-600: #dc6803;
+    --color-danger-50: #fef3f2;
+    --color-danger-600: #d92d20;
+
+    /* Surface */
+    --color-background: var(--color-white);
+    --color-surface: #f8fafc;
+    --color-text: var(--color-gray-900);
+    --color-text-secondary: var(--color-gray-600);
+    --color-text-muted: var(--color-gray-500);
+    --color-border: var(--color-gray-200);
+
+    /* Typography */
+    --font-sans:
+            Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+            Roboto, Helvetica, Arial, sans-serif;
+
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+    --font-size-5xl: 3rem;
+
+    /* Spacing */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+
+    /* Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-full: 9999px;
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgb(16 24 40 / 0.05);
+    --shadow-sm:
+            0 1px 3px rgb(16 24 40 / 0.1),
+            0 1px 2px rgb(16 24 40 / 0.06);
+    --shadow-md:
+            0 4px 8px -2px rgb(16 24 40 / 0.1),
+            0 2px 4px -2px rgb(16 24 40 / 0.06);
+    --shadow-lg:
+            0 12px 24px -4px rgb(16 24 40 / 0.12);
+
+    /* Layout */
+    --container-max: 1280px;
+
+    /* Motion */
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+}

@@ -1,13 +1,41 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import { appRoutes } from './app.routes';
+import {
+    ApplicationConfig,
+    LOCALE_ID
+} from '@angular/core';
+
+import {
+    registerLocaleData
+} from '@angular/common';
+
+import localePt from '@angular/common/locales/pt';
+
+import {
+    provideRouter
+} from '@angular/router';
+
+import {
+    provideHttpClient
+} from '@angular/common/http';
+
+import {
+    provideAnimations
+} from '@angular/platform-browser/animations';
+
+import {
+    appRoutes
+} from './app.routes';
+
+registerLocaleData(localePt);
 
 export const appConfig: ApplicationConfig = {
     providers: [
         provideRouter(appRoutes),
         provideHttpClient(),
-        provideAnimations()
+        provideAnimations(),
+
+        {
+            provide: LOCALE_ID,
+            useValue: 'pt-BR'
+        }
     ]
 };

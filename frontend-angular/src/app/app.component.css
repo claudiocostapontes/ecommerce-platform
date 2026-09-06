@@ -1,31 +1,14 @@
-.app-container {
+:host {
+    display: block;
+    min-height: 100vh;
+}
+
+.app-shell {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-.header {
-    background-color: #ffffff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.navbar-brand {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--primary-color);
-}
-
 .main-content {
     flex: 1;
-}
-
-.footer {
-    background-color: var(--dark-color);
-    color: white;
-    text-align: center;
-    padding: 2rem 0;
-    margin-top: 3rem;
 }

@@ -6,7 +6,10 @@ import { Component } from '@angular/core';
   template: `
     <footer class="footer">
       <div class="footer-content">
-        <p>&copy; {{ currentYear }} E-commerce Platform. All rights reserved.</p>
+        <p>
+          &copy; {{ currentYear }} Nonato Eletromóveis.
+          Todos os direitos reservados.
+        </p>
       </div>
     </footer>
   `,
