@@ -412,94 +412,43 @@ import {
           </p>
 
           <div class="store-actions">
-            <a
-              href="https://www.google.com/local/place/fid/0x7eb31ec61871c03:0x282ea557ce076d74/photosphere?iu=https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid%3Dcs3tRLknDcYsJm0Ov5ne1g%26cb_client%3Dsearch.gws-prod.gps%26yaw%3D21.45813%26pitch%3D0%26thumbfov%3D100%26w%3D0%26h%3D0&ik=CAISFmNzM3RSTGtuRGNZc0ptME92NW5lMWc%3D&sa=X&ved=2ahUKEwim9vztn9iWAxXRALkGHeWcA1cQpx96BAgnEAU"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="store-action"
-            >
-              Ver localização
-            </a>
+              <a
+               href="https://www.google.com/local/place/fid/0x7eb31ec61871c03:0x282ea557ce076d74/photosphere?iu=https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid%3Dcs3tRLknDcYsJm0Ov5ne1g%26cb_client%3Dsearch.gws-prod.gps%26yaw%3D21.45813%26pitch%3D0%26thumbfov%3D100%26w%3D0%26h%3D0&ik=CAISFmNzM3RSTGtuRGNZc0ptME92NW5lMWc%3D&sa=X&ved=2ahUKEwim9vztn9iWAxXRALkGHeWcA1cQpx96BAgnEAU"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="store-primary"
+              >
+                  Ver localização
+              </a>
 
             <a
               href="#"
-              class="store-action"
+              class="store-secondary"
             >
               Falar pelo WhatsApp
-            </a>
-
-            <a
-              href="https://www.instagram.com/nonatoeletromoveis/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="store-action"
-            >
-              Instagram
-            </a>
-
-            <a
-              href="https://www.facebook.com/search/top?q=moveis%20eletro%20o%20nonato&locale=pt_BR"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="store-action"
-            >
-              Facebook
             </a>
           </div>
         </div>
 
-        <div class="store-visual">
+        <div class="store-visual" aria-hidden="true">
 
-          <img
-            src="assets/brand/logononato.jpg"
-            alt="Nonato Eletromóveis"
-            class="store-logo"
-          />
+          <div class="location-pin">
+            <span></span>
+          </div>
 
           <strong>
             Frecheirinha
           </strong>
 
-          <span class="store-state">
+          <span>
             Ceará
           </span>
 
           <div class="location-line"></div>
 
-          <address class="store-address">
-            <span>
-              R. Cap. Joaquim Francisco, 720 - Centro
-            </span>
-
-            <span>
-              Frecheirinha - CE
-            </span>
-
-            <span>
-              CEP: 62340-000
-            </span>
-          </address>
-
-          <a
-            href="tel:+558836551692"
-            class="store-phone"
-          >
-            (88) 3655-1692
-          </a>
-
-          <div class="store-hours">
-            <b>
-              Horário de funcionamento
-            </b>
-
-            <span>
-              Segunda-feira a sábado
-            </span>
-
-            <span>
-              07:20 às 17:40
-            </span>
-          </div>
+          <small>
+            Nonato Eletromóveis
+          </small>
 
         </div>
 
